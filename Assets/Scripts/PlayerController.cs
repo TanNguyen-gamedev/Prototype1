@@ -13,26 +13,42 @@ public class PlayerController : MonoBehaviour
 
     // Vector 2 store amount of horizontal and vertical of the player input
     private Vector2 _moveInput;
+    private InputAction _moveAction;
 
     private Rigidbody _rb;
 
+    private void Awake()
+    {
+        _moveAction = _playerInput.actions["Move"];
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         // Get all the needed component
         _rb = GetComponent<Rigidbody>();
-        _playerInput = GetComponent<PlayerInput>();
 
         // Avoid the Rigidbody to behave/flip over when move
         _rb.freezeRotation = true;
     }
 
+    private void OnEnable()
+    {
+        _moveAction.performed += OnMove;
+        _moveAction.canceled += OnMove;
+    }
+
+        private void OnDisable()
+    {
+        _moveAction.performed -= OnMove;
+        _moveAction.canceled -= OnMove;
+    }
+
 	// Public method for the Player Input calls
-    public void OnMove(InputValue inputValue)
+    public void OnMove(InputAction.CallbackContext callback)
     {
         // Store the changed value when move input hit
-        _moveInput = inputValue.Get<Vector2>();
+        _moveInput = callback.ReadValue<Vector2>();
     }
 
 
